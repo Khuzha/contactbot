@@ -1,6 +1,8 @@
 const telegraf = require('telegraf')
 const config = require('./config')
-const bot = new telegraf(config.token)
+const token = require('./token')
+const bot = new telegraf(token)
+
 
 bot.start((ctx) => {
   if (ctx.chat.id == config.myid){t
@@ -8,6 +10,10 @@ bot.start((ctx) => {
   } else {
   ctx.reply(config.hello/*, {reply_markup: {inline_keyboard: [[{text: '🇬🇧 Change lang', callback_config: 'en'}]]}}*/)
   }
+})
+
+bot.on('sticker', (ctx) => {
+  console.log(ctx.message)
 })
 
 bot.on('text', (ctx) => {
