@@ -12,6 +12,26 @@ bot.start((ctx) => {
   }
 })
 
+bot.on('text', (ctx) => {
+  if (config.myid == ctx.chat.id) {
+    if ('reply_to_message' in ctx.message) {
+      bot.telegram.sendMessage(ctx.message.reply_to_message.forward_from.id, ctx.message.text)
+        .catch((err) => sendError(err, ctx))
+      lastId = ctx.message.reply_to_message.forward_from.id
+    } else {
+      console.log(lastId)
+      if (lastId != undefined) {
+        bot.telegram.sendMessage(lastId, ctx.message.text)
+          .catch((err) => sendError(err, ctx))
+      } else {
+        ctx.reply('Выбери, кому отвечать.')
+      }
+    }
+  } else {
+    ctx.forwardMessage(config.myid, ctx.from.id, ctx.message.id)
+  }
+})
+
 bot.on('sticker', (ctx) => {
   if (config.myid == ctx.chat.id) {
     if ('reply_to_message' in ctx.message) {
@@ -31,16 +51,72 @@ bot.on('sticker', (ctx) => {
   }
 })
 
-bot.on('text', (ctx) => {
+bot.on('photo', (ctx) => {
   if (config.myid == ctx.chat.id) {
     if ('reply_to_message' in ctx.message) {
-      bot.telegram.sendMessage(ctx.message.reply_to_message.forward_from.id, ctx.message.text)
+      bot.telegram.sendPhoto(ctx.message.reply_to_message.forward_from.id, ctx.message.photo[3].file_id)
         .catch((err) => sendError(err, ctx))
       lastId = ctx.message.reply_to_message.forward_from.id
     } else {
-      console.log(lastId)
       if (lastId != undefined) {
-        bot.telegram.sendMessage(lastId, ctx.message.text)
+        bot.telegram.sendPhoto()(lastId, ctx.message.photo[3].file_id)
+          .catch((err) => sendError(err, ctx))
+      } else {
+        ctx.reply('Выбери, кому отвечать.')
+      }
+    }
+  } else {
+    ctx.forwardMessage(config.myid, ctx.from.id, ctx.message.id)
+  }
+})
+
+bot.on('voice', (ctx) => {
+  if (config.myid == ctx.chat.id) {
+    if ('reply_to_message' in ctx.message) {
+      bot.telegram.sendVoice(ctx.message.reply_to_message.forward_from.id, ctx.message.voice.file_id)
+        .catch((err) => sendError(err, ctx))
+      lastId = ctx.message.reply_to_message.forward_from.id
+    } else {
+      if (lastId != undefined) {
+        bot.telegram.sendVoice(lastId, ctx.message.voice.file_id)
+          .catch((err) => sendError(err, ctx))
+      } else {
+        ctx.reply('Выбери, кому отвечать.')
+      }
+    }
+  } else {
+    ctx.forwardMessage(config.myid, ctx.from.id, ctx.message.id)
+  }
+})
+
+bot.on('video', (ctx) => {
+  if (config.myid == ctx.chat.id) {
+    if ('reply_to_message' in ctx.message) {
+      bot.telegram.sendVideo(ctx.message.reply_to_message.forward_from.id, ctx.message.video.file_id)
+        .catch((err) => sendError(err, ctx))
+      lastId = ctx.message.reply_to_message.forward_from.id
+    } else {
+      if (lastId != undefined) {
+        bot.telegram.sendVideo(lastId, ctx.message.video.file_id)
+          .catch((err) => sendError(err, ctx))
+      } else {
+        ctx.reply('Выбери, кому отвечать.')
+      }
+    }
+  } else {
+    ctx.forwardMessage(config.myid, ctx.from.id, ctx.message.id)
+  }
+})
+
+bot.on('contact', (ctx) => {
+  if (config.myid == ctx.chat.id) {
+    if ('reply_to_message' in ctx.message) {
+      bot.telegram.sendContact(ctx.message.reply_to_message.forward_from.id, ctx.message.contact.phone_number, ctx.message.contact.first_name)
+        .catch((err) => sendError(err, ctx))
+      lastId = ctx.message.reply_to_message.forward_from.id
+    } else {
+      if (lastId != undefined) {
+        bot.telegram.sendContact(lastId, ctx.message.contact.phone_number, ctx.message.contact.first_name)
           .catch((err) => sendError(err, ctx))
       } else {
         ctx.reply('Выбери, кому отвечать.')
