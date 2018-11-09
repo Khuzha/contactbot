@@ -127,15 +127,76 @@ bot.on('contact', (ctx) => {
   }
 })
 
+bot.on('document', (ctx) => {
+  console.log(ctx.message)
+  if (config.myid == ctx.chat.id) {
+    if ('reply_to_message' in ctx.message) {
+      bot.telegram.sendDocument(ctx.message.reply_to_message.forward_from.id, ctx.message.document.file_id)
+        .catch((err) => sendError(err, ctx))
+      lastId = ctx.message.reply_to_message.forward_from.id
+    } else {
+      console.log(lastId)
+      if (lastId != undefined) {
+        bot.telegram.sendDocument(lastId, ctx.message.document.file_id)
+          .catch((err) => sendError(err, ctx))
+      } else {
+        ctx.reply('Выбери, кому отвечать.')
+      }
+    }
+  } else {
+    ctx.forwardMessage(config.myid, ctx.from.id, ctx.message.id)
+  }
+})
+
+bot.on('animation', (ctx) => {
+  if (config.myid == ctx.chat.id) {
+    if ('reply_to_message' in ctx.message) {
+      bot.telegram.sendAnimation(ctx.message.reply_to_message.forward_from.id, ctx.message.animation.file_id)
+        .catch((err) => sendError(err, ctx))
+      lastId = ctx.message.reply_to_message.forward_from.id
+    } else {
+      console.log(lastId)
+      if (lastId != undefined) {
+        bot.telegram.sendAnimation(lastId, ctx.message.animation.file_id)
+          .catch((err) => sendError(err, ctx))
+      } else {
+        ctx.reply('Выбери, кому отвечать.')
+      }
+    }
+  } else {
+    ctx.forwardMessage(config.myid, ctx.from.id, ctx.message.id)
+  }
+})
+
+bot.on('game', (ctx) => {
+  if (config.myid == ctx.chat.id) {
+    if ('reply_to_message' in ctx.message) {
+      bot.telegram.sendGame(ctx.message.reply_to_message.forward_from.id, ctx.message.game.file_id)
+        .catch((err) => sendError(err, ctx))
+      lastId = ctx.message.reply_to_message.forward_from.id
+    } else {
+      console.log(lastId)
+      if (lastId != undefined) {
+        bot.telegram.sendGame(lastId, ctx.message.game.file_id)
+          .catch((err) => sendError(err, ctx))
+      } else {
+        ctx.reply('Выбери, кому отвечать.')
+      }
+    }
+  } else {
+    ctx.forwardMessage(config.myid, ctx.from.id, ctx.message.id)
+  }
+})
+
 function sendError (err, ctx) {
   console.log(err)
   if (err.response.description != 'Forbidden: bot was blocked by the user') {
     if (err != undefined && err != null)
       if (ctx != undefined) {
-        bot.telegram.sendMessage(62253745, 'Ошибка у [' + ctx.chat.first_name + '](tg://user?id=' + ctx.chat.id + ')\nТекст ошибки:\n ' + err.toString(), {parse_mode: 'markdown'})
+        bot.telegram.sendMessage(config.myid, 'Ошибка у [' + ctx.chat.first_name + '](tg://user?id=' + ctx.chat.id + ')\nТекст ошибки:\n ' + err.toString(), {parse_mode: 'markdown'})
           .catch((err) => console.log(err))
       } else {
-        bot.telegram.sendMessage(62253745, 'Ошибка!\nТекст ошибки:\n ' + JSON.stringify(err), {parse_mode: 'markdown'})
+        bot.telegram.sendMessage(config.myid, 'Ошибка!\nТекст ошибки:\n ' + JSON.stringify(err), {parse_mode: 'markdown'})
           .catch((err) => console.log(err))
       }
   } else {
