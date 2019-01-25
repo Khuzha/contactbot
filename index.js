@@ -5,8 +5,8 @@ const Telegraf = require('telegraf')
 const session = require('telegraf/session')
 const Stage = require('telegraf/stage')
 const Scene = require('telegraf/scenes/base')
-const { leave } = Stage
 const bot = new Telegraf(token.tok)
+const { leave } = Stage
 
 const mainScene = new Scene('mainScene')
 const stage = new Stage()
@@ -23,24 +23,34 @@ mongo.connect('mongodb://localhost:27017', {useNewUrlParser: true}, (err, client
 })
 
 
-
 bot.start(ctx => {
   (async () => {
     const user = await db.collection('users').find({userId: ctx.from.id}).toArray()
     if (user.length !== 0) {
       ctx.reply(langer('firstHelloDef', user[0].lang, {name: user[0].name}))
     } else {
+      try {
+        console.log('scene:' + ctx.scene)
+        ctx.scene.enter('mainScene')
+      } catch (err) {
+        console.log(err)
+      }
       langer('firstHelloUndef', ctx.from.language_code, {ctx: ctx})
     }
   })()
 })
 
+mainScene.on('text', ctx => {
+  console.log(2)
+})
+
 mainScene.action(/lang_*/, ctx => {
   langer('askName', ctx.update.callback_query.data.substr(5), {ctx: ctx})
+  console.log(1)
 })
 
 bot.on('text', ctx => {
-
+  
 })
 
 function langer(name, lang, object) {
@@ -52,7 +62,6 @@ function langer(name, lang, object) {
 
     switch(name) {
       case 'firstHelloDef': 
-        ctx.scene.enter('mainScene')
         return 'Welcome ' + object.name + '! Type your message.'
       case 'firstHelloUndef':
         return object.ctx.reply('Hello! Is your language 🇬🇧 English? Confirm that or select another, please:', {reply_markup: {inline_keyboard: [[{text: '🇷🇺 Русский', callback_data: 'lang_ru'}, {text: '🇩🇪 Deutsch', callback_data: 'lang_de'}], [{text: '✅ Right. English', callback_data: 'lang_en'}]]}})
